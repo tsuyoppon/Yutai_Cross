@@ -7,11 +7,18 @@ Streamlit版 スプレッド取引P/L計算器
 import streamlit as st
 import pandas as pd
 from datetime import date, datetime
-import requests
-from bs4 import BeautifulSoup
-import re
 from dataclasses import dataclass
 from dateutil.relativedelta import relativedelta
+
+# オプションのライブラリ（価格取得用）
+try:
+    import requests
+    from bs4 import BeautifulSoup
+    HAS_SCRAPING_LIBS = True
+except ImportError:
+    requests = None
+    BeautifulSoup = None
+    HAS_SCRAPING_LIBS = False
 
 # 既存のspread_trade_pl_calculator.pyから必要な関数とクラスをインポート
 from spread_trade_pl_calculator import (
@@ -145,7 +152,10 @@ def main():
         )
         
         if price_method == "Yahoo! Finance（自動取得）":
-            if st.button("🔄 Yahoo!から価格を取得", type="primary"):
+            if not HAS_SCRAPING_LIBS:
+                st.error("❌ Yahoo! Finance取得に必要なライブラリがインストールされていません")
+                st.info("💡 代替データソースまたは手動入力をお使いください")
+            elif st.button("🔄 Yahoo!から価格を取得", type="primary"):
                 try:
                     with st.spinner(f"{ticker}の気配値を取得中..."):
                         ask_price, bid_price = fetch_bid_ask_yahoo(ticker)
