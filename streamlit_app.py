@@ -361,7 +361,7 @@ def display_results(params: TradeParams, result: TradeResult):
         else:
             return ''
     
-    styled_df = df.style.applymap(color_pl, subset=['金額（円）'])
+    styled_df = df.style.map(color_pl, subset=['金額（円）'])
     st.dataframe(styled_df, use_container_width=True, hide_index=True)
     
     # 合計P/L
